@@ -152,5 +152,7 @@ def multi_layer(lat, long, base_dir: str) -> List[SingleValuePixel]:
 
 
 if __name__ == "__main__":
-    output = multi_layer(29.798146, -97.071763, base_dir="./Lower_Colorado_buffered")
+    output = multi_layer(
+        29.798146, -97.071763, base_dir="./layer/Lower_Colorado_buffered"
+    )
     pprint(output)
