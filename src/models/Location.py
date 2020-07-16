@@ -11,5 +11,10 @@ class Coordinate(BaseModel):
     longitude: float
 
 
+class AddressInformation(BaseModel):
+    full_address: str
+    coordinate: Coordinate
+
+
 class CoordinateGroup(BaseModel):
     coordinates: List[Coordinate]
