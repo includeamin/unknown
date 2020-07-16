@@ -1,10 +1,11 @@
 from logging import info
 import os
+from src.settings.Settings import path_settings
 
 
 class PathManager:
     @staticmethod
-    def create_out_put(tif: str, base: str = "./out"):
+    def create_out_put(tif: str, base: str = path_settings.base_output_dir):
         dirs = tif.split("/")[1:]
         dirs_list = [base]
         dirs_list.extend(dirs[:-1])

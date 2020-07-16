@@ -12,7 +12,6 @@ from rasterio.warp import calculate_default_transform, reproject, Resampling
 from src.models.Pixel import SeriesValuePixel, SingleValuePixel
 from src.models.Location import Coordinate
 from src.lib.ReProject import ToEPSG4326, ProjectionTools
-from src.settings.Settings import path_settings
 
 
 class ExtractorInterface:
