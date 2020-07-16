@@ -11,6 +11,8 @@ import rasterio
 from rasterio.warp import calculate_default_transform, reproject, Resampling
 from src.models.Pixel import SeriesValuePixel, SingleValuePixel
 from src.models.Location import Coordinate
+from src.lib.ReProject import ToEPSG4326, ProjectionTools
+from src.settings.Settings import path_settings
 
 
 class ExtractorInterface:
@@ -29,7 +31,6 @@ class SingleLayer(ExtractorInterface):
             index = dataset.index(self.longitude, self.latitude)
             window = Window(index[1] - 1, index[0] - 1, index[1] + 1, index[0] + 1)
             pixel_series = []
-            start = time.time()
             for i in range(1, dataset.count):
                 try:
                     pixel_value = dataset.read(i, window=window)[index]
@@ -37,9 +38,6 @@ class SingleLayer(ExtractorInterface):
                     pixel_value = dataset.read(i)[index]
                 pixel_series.append(pixel_value)
 
-            end = time.time()
-            info(f"process time: {end - start} second")
-            info(f"Pixel Value: {pixel_series} ")
             if len(pixel_series) == 1:
                 return SingleValuePixel(
                     coordinate=Coordinate(latitude=self.latitude, longitude=self.longitude), value=pixel_series[0],
@@ -53,8 +51,31 @@ class SingleLayer(ExtractorInterface):
 
 
 class MultiLayer(ExtractorInterface):
+    def __init__(self, latitude: float, longitude: float, base_dir: str):
+        self.latitude = latitude
+        self.longitude = longitude
+        self.base_dir = base_dir
+
     def extract(self):
-        pass
+        results: List[SingleValuePixel] = []
+        layer_list = os.listdir(self.base_dir)
+        for layer in layer_list:
+            if layer == "WSB":
+                continue
+            # Assume we have only one tif in every layer directory
+            tif = glob.glob(os.path.join(self.base_dir, layer, "*.tif"))[0]
+            info(f"processing {layer} layer ...")
+            if ProjectionTools.is_epsg_4326(tif):
+                info("Coordinate Reference system is not EPSG:4326")
+                info("Change Projection to EPSG:4326")
+                result_path = ToEPSG4326(tif).convert()
+                result = SingleLayer(self.latitude, self.longitude, result_path).extract()
+
+            else:
+                info("Coordinate Reference system is EPSG:4326")
+                result = SingleLayer(self.latitude, self.longitude, tif).extract()
+            results.append(result)
+        return results
 
 
 class StackLayer(ExtractorInterface):
