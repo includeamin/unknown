@@ -19,3 +19,6 @@ Coordinate Reference System = EPSG:4326
 EPSG:4326 specifically states that the coordinate order should be latitude, longitude.
 """
 ```
+
+## IDW 
+Inverse Distance Weight
