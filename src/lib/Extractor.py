@@ -40,13 +40,19 @@ class SingleLayer(ExtractorInterface):
 
             if len(pixel_series) == 1:
                 return SingleValuePixel(
-                    coordinate=Coordinate(latitude=self.latitude, longitude=self.longitude), value=pixel_series[0],
-                    layer=self.tif
+                    coordinate=Coordinate(
+                        latitude=self.latitude, longitude=self.longitude
+                    ),
+                    value=pixel_series[0],
+                    layer=self.tif,
                 )
             else:
                 return SeriesValuePixel(
-                    coordinate=Coordinate(latitude=self.latitude, longitude=self.longitude), values=pixel_series,
-                    layer=self.tif
+                    coordinate=Coordinate(
+                        latitude=self.latitude, longitude=self.longitude
+                    ),
+                    values=pixel_series,
+                    layer=self.tif,
                 )
 
 
@@ -69,7 +75,9 @@ class MultiLayer(ExtractorInterface):
                 info("Coordinate Reference system is not EPSG:4326")
                 info("Change Projection to EPSG:4326")
                 result_path = ToEPSG4326(tif).convert()
-                result = SingleLayer(self.latitude, self.longitude, result_path).extract()
+                result = SingleLayer(
+                    self.latitude, self.longitude, result_path
+                ).extract()
 
             else:
                 info("Coordinate Reference system is EPSG:4326")
