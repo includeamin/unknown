@@ -25,7 +25,7 @@ class SingleLayer(ExtractorInterface):
             index = dataset.index(self.longitude, self.latitude)
             window = Window(index[1] - 1, index[0] - 1, index[1] + 1, index[0] + 1)
             pixel_series = []
-            for i in range(1, dataset.count):
+            for i in range(1, dataset.count + 1):
                 try:
                     pixel_value = dataset.read(i, window=window)[index]
                 except IndexError:
