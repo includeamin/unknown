@@ -1,4 +1,4 @@
-from src.models.Address import AddressString
+from src.models.Location import AddressString
 from geopy.geocoders import Nominatim
 from src.settings.Settings import location_settings
 from geopy.adapters import AioHTTPAdapter
