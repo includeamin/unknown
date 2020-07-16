@@ -55,6 +55,7 @@ def single_layer(lat, long, infile):
             pixel_value = dataset.read(1, window=window)[index]
         except IndexError:
             pixel_value = dataset.read(1)[index]
+
         end = time.time()
         info(f"process time: {end - start} second")
         info(f"Pixel Value: {pixel_value} ")
@@ -63,10 +64,10 @@ def single_layer(lat, long, infile):
                 latitude=lat, longitude=long, value=pixel_value, tif=infile
             )
         elif (
-            isinstance(pixel_value, numpy.int8)
-            or isinstance(pixel_value, numpy.float32)
-            or isinstance(pixel_value, numpy.uint16)
-            or isinstance(pixel_value, numpy.int32)
+                isinstance(pixel_value, numpy.int8)
+                or isinstance(pixel_value, numpy.float32)
+                or isinstance(pixel_value, numpy.uint16)
+                or isinstance(pixel_value, numpy.int32)
         ):
             return SingleValuePixel(
                 latitude=lat, longitude=long, value=pixel_value, tif=infile
@@ -75,8 +76,61 @@ def single_layer(lat, long, infile):
             raise ValueError(f"Unknown PixelValue {pixel_value}")
 
 
-def stack_layer(lat: float, long: float):
-    pass
+def single_layer_stack(lat, long, infile):
+    with rio.open(infile, "r") as dataset:
+        index = dataset.index(long, lat)
+        window = Window(index[1] - 1, index[0] - 1, index[1] + 1, index[0] + 1)
+        start = time.time()
+        pixel_series = []
+        for i in range(1, dataset.count):
+            try:
+                pixel_value = dataset.read(i, window=window)[index]
+            except IndexError:
+                pixel_value = dataset.read(i)[index]
+            pixel_series.append(pixel_value)
+        end = time.time()
+        print(f"process time: {end - start} second")
+        print(f"Pixel Value: {pixel_series} ")
+        return SeriesValuePixel(
+            latitude=lat, longitude=long, value=pixel_series, tif=infile
+        )
+        # if isinstance(pixel_value, list):
+        #     return SeriesValuePixel(
+        #         latitude=lat, longitude=long, value=pixel_value, tif=infile
+        #     )
+        # elif (
+        #         isinstance(pixel_value, numpy.int8)
+        #         or isinstance(pixel_value, numpy.float32)
+        #         or isinstance(pixel_value, numpy.uint16)
+        #         or isinstance(pixel_value, numpy.int32)
+        # ):
+        #     return SingleValuePixel(
+        #         latitude=lat, longitude=long, value=pixel_value, tif=infile
+        #     )
+        # else:
+        #     raise ValueError(f"Unknown PixelValue {pixel_value}")
+
+
+def stack_layer(lat: float, long: float, base_dir: str = "./out"):
+    results: List[SeriesValuePixel] = []
+    layer_list = os.listdir(base_dir)
+    for layer in layer_list:
+        if layer == "WSB":
+            continue
+        # Assume we have only one tif in every layer directory
+        tif = glob.glob(os.path.join(base_dir, layer, "*.tif"))[0]
+        info(f"processing {layer} layer ...")
+        if should_change_projection(tif):
+            info("Coordinate Reference system is not EPSG:4326")
+            info("Change Projection to EPSG:4326")
+            result_path = change_projection(tif)
+            result = single_layer_stack(lat, long, result_path)
+
+        else:
+            info("Coordinate Reference system is EPSG:4326")
+            result = single_layer_stack(lat, long, tif)
+        results.append(result)
+    return results
 
 
 def change_projection(tif: str):
@@ -152,7 +206,8 @@ def multi_layer(lat, long, base_dir: str) -> List[SingleValuePixel]:
 
 
 if __name__ == "__main__":
-    output = multi_layer(
-        29.798146, -97.071763, base_dir="./layer/Lower_Colorado_buffered"
+    output = stack_layer(
+        46.153261, -64.754684, base_dir="./layer/Layer_Stack"
     )
-    pprint(output)
+    for item in output:
+        print(item.dict())
