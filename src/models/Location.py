@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import List
 
 
 class AddressString(BaseModel):
@@ -8,3 +9,7 @@ class AddressString(BaseModel):
 class Coordinate(BaseModel):
     latitude: float
     longitude: float
+
+
+class CoordinateGroup(BaseModel):
+    coordinates: List[Coordinate]

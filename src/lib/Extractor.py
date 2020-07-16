@@ -1,14 +1,9 @@
 import glob
 import os
-import time
-import numpy
 import rasterio as rio
 from rasterio.windows import Window
-from pydantic import BaseModel
 from typing import List
 from logging import info
-import rasterio
-from rasterio.warp import calculate_default_transform, reproject, Resampling
 from src.models.Pixel import SeriesValuePixel, SingleValuePixel
 from src.models.Location import Coordinate
 from src.lib.ReProject import ToEPSG4326, ProjectionTools
@@ -83,8 +78,3 @@ class MultiLayer(ExtractorInterface):
                 result = SingleLayer(self.latitude, self.longitude, tif).extract()
             results.append(result)
         return results
-
-
-class StackLayer(ExtractorInterface):
-    def extract(self):
-        pass
