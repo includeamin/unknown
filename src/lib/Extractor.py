@@ -7,6 +7,8 @@ from logging import info
 from src.models.Pixel import SeriesValuePixel, SingleValuePixel
 from src.models.Location import Coordinate
 from src.lib.ReProject import ToEPSG4326, ProjectionTools
+from rasterio import fill
+from rasterio import mask
 
 
 class ExtractorInterface:
@@ -27,7 +29,8 @@ class SingleLayer(ExtractorInterface):
             pixel_series = []
             for i in range(1, dataset.count + 1):
                 try:
-                    pixel_value = dataset.read(i, window=window)[index]
+                    image_array = dataset.read(i, window=window)
+                    pixel_value = image_array[index]
                 except IndexError:
                     pixel_value = dataset.read(i)[index]
                 pixel_series.append(pixel_value)
