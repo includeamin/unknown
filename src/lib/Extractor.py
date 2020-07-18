@@ -7,8 +7,6 @@ from logging import info
 from src.models.Pixel import SeriesValuePixel, SingleValuePixel
 from src.models.Location import Coordinate
 from src.lib.ReProject import ToEPSG4326, ProjectionTools
-from rasterio import fill
-from rasterio import mask
 
 
 class ExtractorInterface:
