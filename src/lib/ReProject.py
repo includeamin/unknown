@@ -32,7 +32,12 @@ class ToEPSG4326(ReProjectInterface):
             )
             kwargs = src.meta.copy()
             kwargs.update(
-                {"crs": dst_crs, "transform": transform, "width": width, "height": height}
+                {
+                    "crs": dst_crs,
+                    "transform": transform,
+                    "width": width,
+                    "height": height,
+                }
             )
 
             with rasterio.open(result_path, "w", **kwargs) as dst:
