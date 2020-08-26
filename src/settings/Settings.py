@@ -16,6 +16,7 @@ class Storage(BaseSettings):
     GDAL_DISABLE_READDIR_ON_OPEN: str = "YES"
     AWS_VIRTUAL_HOSTING: str = False
     AWS_S3_ENDPOINT = "localhost:32768"
+    IS_SECURE: bool = False
 
 
 location_settings = Location()
