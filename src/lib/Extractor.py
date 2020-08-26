@@ -34,7 +34,7 @@ class SingleLayer(ExtractorInterface):
 
     def s3_extractor(self):
         if not self._s3:
-            raise Exception('S3 Storage Not Applied')
+            raise Exception("S3 Storage Not Applied")
         with self._s3.ENV:
             with rio.open(self.tif) as dataset:
                 return self._process(dataset)
@@ -53,17 +53,13 @@ class SingleLayer(ExtractorInterface):
 
         if len(pixel_series) == 1:
             return SingleValuePixel(
-                coordinate=Coordinate(
-                    latitude=self.latitude, longitude=self.longitude
-                ),
+                coordinate=Coordinate(latitude=self.latitude, longitude=self.longitude),
                 value=pixel_series[0],
                 layer=self.tif,
             )
         else:
             return SeriesValuePixel(
-                coordinate=Coordinate(
-                    latitude=self.latitude, longitude=self.longitude
-                ),
+                coordinate=Coordinate(latitude=self.latitude, longitude=self.longitude),
                 values=pixel_series,
                 layer=self.tif,
             )
