@@ -17,6 +17,7 @@ class Storage(BaseSettings):
     AWS_VIRTUAL_HOSTING: str = False
     AWS_S3_ENDPOINT = "localhost:32768"
     IS_SECURE: bool = False
+    LAYER_BASE_BUCKET: str = 'bigdata'
 
 
 location_settings = Location()
