@@ -2,7 +2,7 @@ import glob
 import os
 import rasterio as rio
 from rasterio.windows import Window
-from typing import List, Optional
+from typing import List, Optional, AsyncIterable
 from logging import info
 
 from src.lib.StorageManager import StorageManagement
@@ -32,7 +32,7 @@ class SingleLayer(ExtractorInterface):
         self._s3 = s3
         return self
 
-    def s3_extractor(self):
+    async def s3_extractor(self):
         if not self._s3:
             raise Exception("S3 Storage Not Applied")
         with self._s3.ENV:
@@ -114,7 +114,7 @@ class S3MultiLayer(ExtractorInterface):
         for layer in layer_list:
             if layer.__contains__("WSB"):
                 continue
-            result = (
+            result = await (
                 SingleLayer(self.latitude, self.longitude, layer)
                 .apply_s3(self._storage)
                 .s3_extractor()
