@@ -1,5 +1,6 @@
 # from src.lib.Location import Address
 from src.lib.Extractor import SingleLayer
+from src.lib.Extractor import S3MultiLayer
 
 path = "s3://bigdata/Layer_Stack/Chia/Chla_05-Jul-16_20-Aug-18.tif"
 
@@ -22,7 +23,10 @@ import asyncio
 
 
 async def main():
-    await StorageManagement().get_list_of_tiffs()
+    ml = S3MultiLayer(29.798146,
+                      -97.071763, "Layer/", StorageManagement())
+    result = await ml.s3_extract()
+    print(result)
 
 
 loop = asyncio.get_event_loop()

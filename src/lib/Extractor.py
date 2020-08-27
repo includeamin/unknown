@@ -36,7 +36,7 @@ class SingleLayer(ExtractorInterface):
         if not self._s3:
             raise Exception("S3 Storage Not Applied")
         with self._s3.ENV:
-            with rio.open(self.tif) as dataset:
+            with rio.open(self._s3.get_storage_path(self.tif)) as dataset:
                 return self._process(dataset)
 
     def _process(self, dataset):
@@ -96,4 +96,41 @@ class MultiLayer(ExtractorInterface):
 
 
 class S3MultiLayer(ExtractorInterface):
-    pass
+    def __init__(self, latitude: float, longitude: float, base_dir: str, storage: StorageManagement):
+        self.latitude = latitude
+        self.longitude = longitude
+        self.base_dir = base_dir
+        self._storage = storage
+
+    async def extract(self):
+        results: List[SingleValuePixel] = []
+        layer_list = await self._storage.get_list_of_tiffs(self.base_dir)
+        for layer in layer_list:
+            if layer == "WSB":
+                continue
+            # Assume we have only one tif in every layer directory
+            tif = glob.glob(os.path.join(self.base_dir, layer, "*.tif"))[0]
+            info(f"processing {layer} layer ...")
+            if ProjectionTools.is_epsg_4326(tif):
+                info("Coordinate Reference system is not EPSG:4326")
+                info("Change Projection to EPSG:4326")
+                result_path = ToEPSG4326(tif).convert()
+                result = SingleLayer(
+                    self.latitude, self.longitude, result_path
+                ).extract()
+
+            else:
+                info("Coordinate Reference system is EPSG:4326")
+                result = SingleLayer(self.latitude, self.longitude, tif).extract()
+            results.append(result)
+        return results
+
+    async def s3_extract(self) -> List[SingleValuePixel]:
+        results: List[SingleValuePixel] = []
+        layer_list = await self._storage.get_list_of_tiffs(self.base_dir)
+        for layer in layer_list:
+            if layer.__contains__("WSB"):
+                continue
+            result = SingleLayer(self.latitude, self.longitude, layer).apply_s3(self._storage).s3_extractor()
+            results.append(result)
+        return results
