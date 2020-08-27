@@ -31,19 +31,26 @@ class StorageManagement(metaclass=Singleton):
             AWS_S3_ENDPOINT=storage_settings.AWS_S3_ENDPOINT,
             session=self.aws,
         )
-        self._s3 = boto3.resource("s3", aws_access_key_id=storage_settings.aws_access_key_id,
-                                  aws_secret_access_key=storage_settings.aws_secret_access_key,
-                                  endpoint_url=f"http{'s' if storage_settings.IS_SECURE else ''}://" + storage_settings.AWS_S3_ENDPOINT,
-                                  use_ssl=storage_settings.IS_SECURE
-                                  )
+        self._s3 = boto3.resource(
+            "s3",
+            aws_access_key_id=storage_settings.aws_access_key_id,
+            aws_secret_access_key=storage_settings.aws_secret_access_key,
+            endpoint_url=f"http{'s' if storage_settings.IS_SECURE else ''}://"
+            + storage_settings.AWS_S3_ENDPOINT,
+            use_ssl=storage_settings.IS_SECURE,
+        )
         self._layerBaseBucket = storage_settings.LAYER_BASE_BUCKET
-        self._minio = Minio(endpoint=storage_settings.AWS_S3_ENDPOINT,
-                            access_key=storage_settings.aws_access_key_id,
-                            secret_key=storage_settings.aws_secret_access_key,
-                            secure=storage_settings.IS_SECURE)
+        self._minio = Minio(
+            endpoint=storage_settings.AWS_S3_ENDPOINT,
+            access_key=storage_settings.aws_access_key_id,
+            secret_key=storage_settings.aws_secret_access_key,
+            secure=storage_settings.IS_SECURE,
+        )
 
     async def get_list_of_tiffs(self, base_path: str) -> List[str]:
-        result = self._minio.list_objects(bucket_name=self._layerBaseBucket, prefix=base_path, recursive=True)
+        result = self._minio.list_objects(
+            bucket_name=self._layerBaseBucket, prefix=base_path, recursive=True
+        )
         return [item.object_name for item in result]
 
     def get_storage_path(self, path) -> str:

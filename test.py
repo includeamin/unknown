@@ -5,6 +5,8 @@ from src.lib.Extractor import S3MultiLayer
 path = "s3://bigdata/Layer_Stack/Chia/Chla_05-Jul-16_20-Aug-18.tif"
 
 from src.lib.StorageManager import StorageManagement
+import asyncio
+
 
 # res = (
 #     SingleLayer(
@@ -19,12 +21,10 @@ from src.lib.StorageManager import StorageManagement
 # print(res)
 
 # from src.lib.Location import Address
-import asyncio
 
 
 async def main():
-    ml = S3MultiLayer(29.798146,
-                      -97.071763, "Layer/", StorageManagement())
+    ml = S3MultiLayer(29.798146, -97.071763, "Layer/", StorageManagement())
     result = await ml.s3_extract()
     print(result)
 

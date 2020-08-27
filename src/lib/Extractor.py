@@ -96,7 +96,13 @@ class MultiLayer(ExtractorInterface):
 
 
 class S3MultiLayer(ExtractorInterface):
-    def __init__(self, latitude: float, longitude: float, base_dir: str, storage: StorageManagement):
+    def __init__(
+        self,
+        latitude: float,
+        longitude: float,
+        base_dir: str,
+        storage: StorageManagement,
+    ):
         self.latitude = latitude
         self.longitude = longitude
         self.base_dir = base_dir
@@ -131,6 +137,10 @@ class S3MultiLayer(ExtractorInterface):
         for layer in layer_list:
             if layer.__contains__("WSB"):
                 continue
-            result = SingleLayer(self.latitude, self.longitude, layer).apply_s3(self._storage).s3_extractor()
+            result = (
+                SingleLayer(self.latitude, self.longitude, layer)
+                .apply_s3(self._storage)
+                .s3_extractor()
+            )
             results.append(result)
         return results
