@@ -108,30 +108,7 @@ class S3MultiLayer(ExtractorInterface):
         self.base_dir = base_dir
         self._storage = storage
 
-    async def extract(self):
-        results: List[SingleValuePixel] = []
-        layer_list = await self._storage.get_list_of_tiffs(self.base_dir)
-        for layer in layer_list:
-            if layer == "WSB":
-                continue
-            # Assume we have only one tif in every layer directory
-            tif = glob.glob(os.path.join(self.base_dir, layer, "*.tif"))[0]
-            info(f"processing {layer} layer ...")
-            if ProjectionTools.is_epsg_4326(tif):
-                info("Coordinate Reference system is not EPSG:4326")
-                info("Change Projection to EPSG:4326")
-                result_path = ToEPSG4326(tif).convert()
-                result = SingleLayer(
-                    self.latitude, self.longitude, result_path
-                ).extract()
-
-            else:
-                info("Coordinate Reference system is EPSG:4326")
-                result = SingleLayer(self.latitude, self.longitude, tif).extract()
-            results.append(result)
-        return results
-
-    async def s3_extract(self) -> List[SingleValuePixel]:
+    async def extract(self) -> List[SingleValuePixel]:
         results: List[SingleValuePixel] = []
         layer_list = await self._storage.get_list_of_tiffs(self.base_dir)
         for layer in layer_list:

@@ -25,7 +25,7 @@ import asyncio
 
 async def main():
     ml = S3MultiLayer(29.798146, -97.071763, "Layer/", StorageManagement())
-    result = await ml.s3_extract()
+    result = await ml.extract()
     print(result)
 
 
