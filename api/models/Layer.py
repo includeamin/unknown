@@ -23,6 +23,7 @@ class LayerInDB(BaseModel):
 class AddLayerModel(BaseModel):
     code: str
     name: str
+    raw_name: str
     description: str = None
 
 
