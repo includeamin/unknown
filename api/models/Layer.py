@@ -3,7 +3,17 @@ from datetime import datetime
 from typing import List
 
 
+class DateRange(BaseModel):
+    start: datetime
+    end: datetime
+
+
+class LayerInformation:
+    range: DateRange
+
+
 class Layer(BaseModel):
+    information: LayerInformation
     code: str
     name: str
     description: str = None
@@ -13,6 +23,7 @@ class Layer(BaseModel):
 
 class LayerInDB(BaseModel):
     id: str
+    information: LayerInformation
     code: str
     name: str
     description: str = None
@@ -21,6 +32,7 @@ class LayerInDB(BaseModel):
 
 
 class AddLayerModel(BaseModel):
+    information: LayerInformation
     code: str
     name: str
     raw_name: str
