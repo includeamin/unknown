@@ -82,3 +82,7 @@ class ValidLayers(BaseModel):
 class ValidLayersNearLocation(BaseModel):
     results: List[ValidLayers]
     page: int = 1
+
+
+class GetLayerItemResponse(BaseModel):
+    layers: List[LayerItem]

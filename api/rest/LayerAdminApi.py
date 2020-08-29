@@ -1,5 +1,5 @@
 from api.classes.LayerManager import LayerManger
-from api.models.Layer import AddLayerModel, AddNewLayerItem, GetAllLayers
+from api.models.Layer import AddLayerModel, AddNewLayerItem, GetAllLayers, GetLayerItemResponse
 from fastapi import APIRouter
 from api.models.GlobalModels import GlobalResult
 from typing import Optional
@@ -34,4 +34,13 @@ async def add_layer_item(body: AddNewLayerItem):
 )
 async def get_all(page: Optional[int] = 1):
     result = await LayerManger.Admin.get_all(page)
+    return result
+
+
+@admin_layer_routes.get("/layer-item/load",
+                        status_code=200,
+                        description='get layers item',
+                        response_model=GetLayerItemResponse)
+async def get_layers_item(_id: str):
+    result = await LayerManger.Admin.get_layers_item_of_layer(_id)
     return result
