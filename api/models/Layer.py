@@ -24,13 +24,18 @@ class LayerInformation(BaseModel):
     range: DateRange
 
 
-class Layer(BaseModel):
+class LayerItem(BaseModel):
     information: LayerInformation
+    file_name: str
+
+
+class Layer(BaseModel):
     code: str
     name: str
     description: str = None
     create_at: datetime = datetime.now()
     update_at: datetime = None
+    layers: List[LayerItem]
 
 
 class LayerInDB(BaseModel):
@@ -44,11 +49,15 @@ class LayerInDB(BaseModel):
 
 
 class AddLayerModel(BaseModel):
-    information: LayerInformation
     code: str
     name: str
     raw_name: str
     description: str = None
+
+
+class AddNewLayerItem(BaseModel):
+    information: LayerInformation
+    raw_file_name: str
 
 
 class GetAllLayers(BaseModel):

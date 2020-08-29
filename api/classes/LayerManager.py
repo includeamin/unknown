@@ -10,7 +10,7 @@ class LayerManger:
     class Admin:
         @staticmethod
         async def add(data: AddLayerModel):
-            await LayerManger.Shared.conflict_finder(data.code, data.information)
+            await LayerManger.Shared.is_code_exist(data)
             layer = layer_collection.insert_one(Layer(**data.dict()).dict())
             return GlobalResult(message=str(layer.inserted_id))
 
@@ -27,6 +27,12 @@ class LayerManger:
             pass
 
     class Shared:
+        @staticmethod
+        async def is_code_exist(data):
+            result = layer_collection.find_one({"code": data.code}, {})
+            if result:
+                raise HTTPException(detail=f'layer with {data.code} code already exist', status_code=400)
+
         @staticmethod
         async def conflict_finder(code: str, data: LayerInformation):
             result = layer_collection.find({"code": code}, {"information.range"})
