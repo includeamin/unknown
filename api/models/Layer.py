@@ -1,14 +1,26 @@
 from pydantic import BaseModel
 from datetime import datetime, date
 from typing import List
+from pydantic import validator
+from fastapi import HTTPException
 
 
 class DateRange(BaseModel):
-    start: date
-    end: date
+    start: datetime
+    end: datetime
+
+    @validator("end")
+    def end_validator(cls, v, values):
+        if not isinstance(v, datetime):
+            raise HTTPException(detail="not instance of date", status_code=400)
+        if values["start"].date() >= v.date():
+            raise HTTPException(
+                detail="end should be greater that start", status_code=400
+            )
+        return v
 
 
-class LayerInformation:
+class LayerInformation(BaseModel):
     range: DateRange
 
 
