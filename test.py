@@ -32,17 +32,3 @@
 # loop = asyncio.get_event_loop()
 # loop.run_until_complete(main())
 
-
-from pymongo import MongoClient
-from pydantic import BaseModel
-from src.models.Location import Coordinate
-
-collection = (
-    MongoClient("mongodb://localhost:27017").get_database("test").get_collection("geo")
-)
-
-
-class Pixel(BaseModel):
-    location = {"type": "Point", "coordinate": []}
-    type: str = "single"
-    value: float
