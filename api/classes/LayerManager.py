@@ -10,7 +10,8 @@ from api.models.Layer import (
     ValidLayers,
     ValidLayersNearLocation,
     GetAllLayers,
-    GetLayerItemResponse, UpdateLayerModel,
+    GetLayerItemResponse,
+    UpdateLayerModel,
 )
 from api.db.mongo import layer_collection
 from api.models.GlobalModels import GlobalResult
@@ -48,10 +49,16 @@ class LayerManger:
 
         @staticmethod
         async def delete_layer_item(information: LayerInformation, _id: str):
-            result = layer_collection.update_one({"_id": ObjectId(_id)}, {
-                "$pull": {"layers": {"$elemMatch": {"information": information.dict()}}}})
+            result = layer_collection.update_one(
+                {"_id": ObjectId(_id)},
+                {
+                    "$pull": {
+                        "layers": {"$elemMatch": {"information": information.dict()}}
+                    }
+                },
+            )
             await Tools.update_result_checker(result)
-            return GlobalResult(message='done')
+            return GlobalResult(message="done")
 
         @staticmethod
         async def update(_id: str, body: UpdateLayerModel):
@@ -66,15 +73,17 @@ class LayerManger:
             if body.name:
                 update_value.update({"name": body.name})
             if not update_value:
-                raise HTTPException(detail='nothings for update', status_code=400)
-            result = layer_collection.update_one({"_id": ObjectId(_id)}, {"$set": update_value})
+                raise HTTPException(detail="nothings for update", status_code=400)
+            result = layer_collection.update_one(
+                {"_id": ObjectId(_id)}, {"$set": update_value}
+            )
             await Tools.update_result_checker(result)
-            return GlobalResult(message='done')
+            return GlobalResult(message="done")
 
         @staticmethod
         async def remove(_id: str):
             layer_collection.delete_one({"_id": ObjectId(_id)})
-            return GlobalResult(message='done')
+            return GlobalResult(message="done")
 
         @staticmethod
         async def get():
@@ -91,8 +100,8 @@ class LayerManger:
             paging = Tools.pagination(page)
             result = (
                 layer_collection.find({}, {"layers": 0})
-                    .limit(paging.limit)
-                    .skip(paging.skip)
+                .limit(paging.limit)
+                .skip(paging.skip)
             )
             result = [LayerInDB(**Tools.mongodb_id_converter(item)) for item in result]
             return GetAllLayers(result=result, page=page)
@@ -104,7 +113,7 @@ class LayerManger:
 
         @staticmethod
         async def find_available_layers_near_coordinate(
-                coordinate: Coordinate, page: int = 1
+            coordinate: Coordinate, page: int = 1
         ):
             paging = Tools.pagination(page)
             result = (
@@ -123,8 +132,8 @@ class LayerManger:
                         }
                     }
                 )
-                    .limit(paging.limit)
-                    .skip(paging.skip)
+                .limit(paging.limit)
+                .skip(paging.skip)
             )
             resp = []
             for item in result:
