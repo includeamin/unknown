@@ -238,7 +238,7 @@ class LayerManger:
             )
             resp = []
             for item in result:
-                resp.append(ValidLayers(**item))
+                resp.append(ValidLayers(**Tools.mongodb_id_converter(item)))
             return ValidLayersNearLocation(results=resp, page=page)
 
         @staticmethod

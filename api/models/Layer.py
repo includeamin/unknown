@@ -75,6 +75,7 @@ class GetAllLayers(BaseModel):
 
 
 class ValidLayers(BaseModel):
+    id: str
     code: str
     name: str
     description: str
