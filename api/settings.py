@@ -7,4 +7,13 @@ class APISettings(BaseSettings):
     LAYER_COLLECTION: str = "layers"
 
 
+class Storage(BaseSettings):
+    HOST: str
+    ACCESS_KEY: str
+    SECRET_KEY: str
+    SECURE: bool
+    RAW_FILES_BUCKET: str
+
+
 api_settings = APISettings()
+storage_settings = Storage()
