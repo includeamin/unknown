@@ -4,6 +4,7 @@ from api.models.Layer import (
     AddNewLayerItem,
     GetAllLayers,
     GetLayerItemResponse,
+    UpdateLayerModel
 )
 from fastapi import APIRouter
 from api.models.GlobalModels import GlobalResult
@@ -50,4 +51,10 @@ async def get_all(page: Optional[int] = 1):
 )
 async def get_layers_item(_id: str):
     result = await LayerManger.Admin.get_layers_item_of_layer(_id)
+    return result
+
+
+@admin_layer_routes.put("/layers/update", description='update layer', status_code=201)
+async def update_layer(_id: str, body: UpdateLayerModel):
+    result = await LayerManger.Admin.update(_id, body)
     return result

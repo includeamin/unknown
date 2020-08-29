@@ -10,7 +10,7 @@ from api.models.Layer import (
     ValidLayers,
     ValidLayersNearLocation,
     GetAllLayers,
-    GetLayerItemResponse,
+    GetLayerItemResponse, UpdateLayerModel,
 )
 from api.db.mongo import layer_collection
 from api.models.GlobalModels import GlobalResult
@@ -54,8 +54,22 @@ class LayerManger:
             return GlobalResult(message='done')
 
         @staticmethod
-        async def update():
-            pass
+        async def update(_id: str, body: UpdateLayerModel):
+            update_value = {}
+            if body.code:
+                update_value.update({"code": body.code})
+                await LayerManger.Shared.is_code_exist(body.code, should_exist=False)
+            if body.location:
+                update_value.update({"location": body.location.dict()})
+            if body.description:
+                update_value.update({"description": body.description})
+            if body.name:
+                update_value.update({"name": body.name})
+            if not update_value:
+                raise HTTPException(detail='nothings for update', status_code=400)
+            result = layer_collection.update_one({"_id": ObjectId(_id)}, {"$set": update_value})
+            await Tools.update_result_checker(result)
+            return GlobalResult(message='done')
 
         @staticmethod
         async def remove(_id: str):

@@ -86,3 +86,10 @@ class ValidLayersNearLocation(BaseModel):
 
 class GetLayerItemResponse(BaseModel):
     layers: List[LayerItem]
+
+
+class UpdateLayerModel(BaseModel):
+    location: Location = None
+    code: str = None
+    name: str = None
+    description: str = None
