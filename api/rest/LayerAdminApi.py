@@ -15,13 +15,23 @@ async def layer_add(body: AddLayerModel):
     return result
 
 
-@admin_layer_routes.post("/layer-item/add", description='add layer item', status_code=201, response_model=GlobalResult)
+@admin_layer_routes.post(
+    "/layer-item/add",
+    description="add layer item",
+    status_code=201,
+    response_model=GlobalResult,
+)
 async def add_layer_item(body: AddNewLayerItem):
     result = await LayerManger.Admin.add_layer_item(body)
     return result
 
 
-@admin_layer_routes.get("/layers", description='get all layers', status_code=200, response_model=GetAllLayers)
+@admin_layer_routes.get(
+    "/layers",
+    description="get all layers",
+    status_code=200,
+    response_model=GetAllLayers,
+)
 async def get_all(page: Optional[int] = 1):
     result = await LayerManger.Admin.get_all(page)
     return result
