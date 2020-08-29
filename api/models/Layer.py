@@ -35,23 +35,22 @@ class Layer(BaseModel):
     description: str = None
     create_at: datetime = datetime.now()
     update_at: datetime = None
-    layers: List[LayerItem]
+    layers: List[LayerItem] = []
 
 
 class LayerInDB(BaseModel):
     id: str
-    information: LayerInformation
     code: str
     name: str
     description: str = None
-    create_at: datetime
+    create_at: datetime = datetime.now()
     update_at: datetime = None
+    layers: List[LayerItem] = []
 
 
 class AddLayerModel(BaseModel):
     code: str
     name: str
-    raw_name: str
     description: str = None
 
 
