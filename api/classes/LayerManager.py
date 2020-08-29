@@ -7,6 +7,8 @@ from api.models.Layer import (
     LayerItem,
     ValidLayers,
     ValidLayersNearLocation,
+    GetAllLayers
+
 )
 from api.db.mongo import layer_collection
 from api.models.GlobalModels import GlobalResult
@@ -57,6 +59,13 @@ class LayerManger:
         async def get():
             pass
 
+        @staticmethod
+        async def get_all(page: int):
+            paging = Tools.pagination(page)
+            result = layer_collection.find({}, {'layers': 0}).limit(paging.limit).skip(paging.skip)
+            result = [LayerInDB(**Tools.mongodb_id_converter(item)) for item in result]
+            return GetAllLayers(result=result,page=page)
+
     class Shared:
         @staticmethod
         async def move_layer_from_raws(raw_file_name: str, new_file_name: str):
@@ -64,7 +73,7 @@ class LayerManger:
 
         @staticmethod
         async def find_available_layers_near_coordinate(
-            coordinate: Coordinate, page: int = 1
+                coordinate: Coordinate, page: int = 1
         ):
             paging = Tools.pagination(page)
             result = (
@@ -83,8 +92,8 @@ class LayerManger:
                         }
                     }
                 )
-                .limit(paging.limit)
-                .skip(paging.skip)
+                    .limit(paging.limit)
+                    .skip(paging.skip)
             )
             resp = []
             for item in result:

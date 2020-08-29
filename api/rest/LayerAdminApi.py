@@ -1,7 +1,8 @@
 from api.classes.LayerManager import LayerManger
-from api.models.Layer import AddLayerModel
+from api.models.Layer import AddLayerModel, AddNewLayerItem, GetAllLayers
 from fastapi import APIRouter
 from api.models.GlobalModels import GlobalResult
+from typing import Optional
 
 admin_layer_routes = APIRouter()
 
@@ -14,6 +15,13 @@ async def layer_add(body: AddLayerModel):
     return result
 
 
-# @admin_layer_routes.get("/test")
-# async def test():
-#     await LayerManger.Shared.find_available_layers_near_coordinate(None)
+@admin_layer_routes.post("/layer-item/add", description='add layer item', status_code=201, response_model=GlobalResult)
+async def add_layer_item(body: AddNewLayerItem):
+    result = await LayerManger.Admin.add_layer_item(body)
+    return result
+
+
+@admin_layer_routes.get("/layers", description='get all layers', status_code=200, response_model=GetAllLayers)
+async def get_all(page: Optional[int] = 1):
+    result = await LayerManger.Admin.get_all(page)
+    return result
