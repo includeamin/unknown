@@ -34,7 +34,7 @@ class LayerManger:
         async def add_layer_item(data: AddNewLayerItem):
             await LayerManger.Shared.is_code_exist(code=data.code, should_exist=True)
             file_name = (
-                f"{data.code}-{data.information.range.start.date()}-{data.information.range.end.date()}."
+                f"geo-{data.information.range.start.date()}-{data.information.range.end.date()}."
                 f"{data.raw_file_name.split('.')[-1]}"
             )
             await LayerManger.Shared.move_layer_from_raws(data.raw_file_name, file_name)
