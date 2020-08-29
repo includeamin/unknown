@@ -1,11 +1,11 @@
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, date
 from typing import List
 
 
 class DateRange(BaseModel):
-    start: datetime
-    end: datetime
+    start: date
+    end: date
 
 
 class LayerInformation:
