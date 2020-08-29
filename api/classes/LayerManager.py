@@ -9,7 +9,8 @@ from api.models.Layer import (
     LayerItem,
     ValidLayers,
     ValidLayersNearLocation,
-    GetAllLayers, GetLayerItemResponse,
+    GetAllLayers,
+    GetLayerItemResponse,
 )
 from api.db.mongo import layer_collection
 from api.models.GlobalModels import GlobalResult
@@ -32,10 +33,11 @@ class LayerManger:
         async def add_layer_item(data: AddNewLayerItem):
             await LayerManger.Shared.is_code_exist(code=data.code, should_exist=True)
             file_name = (
-                f"{data.code}-{data.information.range.start}-{data.information.range.end}."
+                f"{data.code}-{data.information.range.start.date()}-{data.information.range.end.date()}."
                 f"{data.raw_file_name.split('.')[-1]}"
             )
             await LayerManger.Shared.move_layer_from_raws(data.raw_file_name, file_name)
+            await LayerManger.Shared.conflict_finder(data.code, data.information)
             item = LayerItem(**data.dict())
             item.file_name = file_name
             result = layer_collection.update_one(
@@ -125,8 +127,8 @@ class LayerManger:
 
         @staticmethod
         async def conflict_finder(code: str, data: LayerInformation):
-            result = layer_collection.find({"code": code}, {"information.range"})
-            information = [item["information"]["range"] for item in result]
+            result = layer_collection.find_one({"code": code}, {"layers"})
+            information = [item["information"]["range"] for item in result["layers"]]
             LayerManger.Shared.overlap_checking(
                 information, data.range.start, data.range.end
             )
