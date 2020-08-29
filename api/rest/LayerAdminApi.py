@@ -60,7 +60,7 @@ async def update_layer(_id: str, body: UpdateLayerModel):
     return result
 
 
-@admin_layer_routes.get("/layer/load", description='load layer', status_code=200)
+@admin_layer_routes.get("/layer/load", description="load layer", status_code=200)
 async def get_layer(_id):
     result = await LayerManger.Admin.get(_id)
     return result

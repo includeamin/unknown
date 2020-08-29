@@ -101,8 +101,8 @@ class LayerManger:
             paging = Tools.pagination(page)
             result = (
                 layer_collection.find({}, {"layers": 0})
-                    .limit(paging.limit)
-                    .skip(paging.skip)
+                .limit(paging.limit)
+                .skip(paging.skip)
             )
             result = [LayerInDB(**Tools.mongodb_id_converter(item)) for item in result]
             return GetAllLayers(result=result, page=page)
@@ -114,7 +114,7 @@ class LayerManger:
 
         @staticmethod
         async def find_available_layers_near_coordinate(
-                coordinate: Coordinate, page: int = 1
+            coordinate: Coordinate, page: int = 1
         ):
             paging = Tools.pagination(page)
             result = (
@@ -133,8 +133,8 @@ class LayerManger:
                         }
                     }
                 )
-                    .limit(paging.limit)
-                    .skip(paging.skip)
+                .limit(paging.limit)
+                .skip(paging.skip)
             )
             resp = []
             for item in result:
