@@ -22,12 +22,11 @@ class DateRange(BaseModel):
 
 class Location(BaseModel):
     type: str = 'Point'
-    coordinate: List[float]
+    coordinates: List[float]
 
 
 class LayerInformation(BaseModel):
     range: DateRange
-    location: Location
 
 
 class LayerItem(BaseModel):
@@ -36,6 +35,7 @@ class LayerItem(BaseModel):
 
 
 class Layer(BaseModel):
+    location: Location
     code: str
     name: str
     description: str = None
@@ -46,6 +46,7 @@ class Layer(BaseModel):
 
 class LayerInDB(BaseModel):
     id: str
+    location: Location
     code: str
     name: str
     description: str = None
@@ -55,6 +56,7 @@ class LayerInDB(BaseModel):
 
 
 class AddLayerModel(BaseModel):
+    location: Location
     code: str
     name: str
     description: str = None
@@ -69,3 +71,14 @@ class AddNewLayerItem(BaseModel):
 class GetAllLayers(BaseModel):
     result: List[LayerInDB]
     page: int
+
+
+class ValidLayers(BaseModel):
+    code: str
+    name: str
+    description: str
+
+
+class ValidLayersNearLocation(BaseModel):
+    results: List[ValidLayers]
+    page: int = 1

@@ -12,3 +12,8 @@ admin_layer_routes = APIRouter()
 async def layer_add(body: AddLayerModel):
     result = await LayerManger.Admin.add(body)
     return result
+
+
+# @admin_layer_routes.get("/test")
+# async def test():
+#     await LayerManger.Shared.find_available_layers_near_coordinate(None)

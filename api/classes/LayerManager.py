@@ -5,6 +5,8 @@ from api.models.Layer import (
     LayerInformation,
     AddNewLayerItem,
     LayerItem,
+    ValidLayers,
+    ValidLayersNearLocation
 )
 from api.db.mongo import layer_collection
 from api.models.GlobalModels import GlobalResult
@@ -12,6 +14,7 @@ from fastapi import HTTPException
 from datetime import timedelta, datetime, date
 from typing import List
 from api.utils.Tools import Tools
+from src.models.Location import Coordinate
 
 
 class LayerManger:
@@ -59,6 +62,17 @@ class LayerManger:
         @staticmethod
         async def move_layer_from_raws(raw_file_name: str, new_file_name: str):
             pass
+
+        @staticmethod
+        async def find_available_layers_near_coordinate(coordinate: Coordinate, page: int = 1):
+            paging = Tools.pagination(page)
+            result = layer_collection.find({"location": {"$near": {
+                "$geometry": {"type": "Point", "coordinates": [coordinate.longitude, coordinate.latitude]}
+            }}}).limit(paging.limit).skip(paging.skip)
+            resp = []
+            for item in result:
+                resp.append(ValidLayers(**item))
+            return ValidLayersNearLocation(results=resp, page=page)
 
         @staticmethod
         async def is_code_exist(code: str, should_exist: bool = False):
