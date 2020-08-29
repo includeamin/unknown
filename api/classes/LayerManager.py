@@ -47,16 +47,20 @@ class LayerManger:
             return GlobalResult(message="done")
 
         @staticmethod
-        async def delete_layer_item():
-            pass
+        async def delete_layer_item(information: LayerInformation, _id: str):
+            result = layer_collection.update_one({"_id": ObjectId(_id)}, {
+                "$pull": {"layers": {"$elemMatch": {"information": information.dict()}}}})
+            await Tools.update_result_checker(result)
+            return GlobalResult(message='done')
 
         @staticmethod
         async def update():
             pass
 
         @staticmethod
-        async def remove():
-            pass
+        async def remove(_id: str):
+            layer_collection.delete_one({"_id": ObjectId(_id)})
+            return GlobalResult(message='done')
 
         @staticmethod
         async def get():
@@ -73,8 +77,8 @@ class LayerManger:
             paging = Tools.pagination(page)
             result = (
                 layer_collection.find({}, {"layers": 0})
-                .limit(paging.limit)
-                .skip(paging.skip)
+                    .limit(paging.limit)
+                    .skip(paging.skip)
             )
             result = [LayerInDB(**Tools.mongodb_id_converter(item)) for item in result]
             return GetAllLayers(result=result, page=page)
@@ -86,7 +90,7 @@ class LayerManger:
 
         @staticmethod
         async def find_available_layers_near_coordinate(
-            coordinate: Coordinate, page: int = 1
+                coordinate: Coordinate, page: int = 1
         ):
             paging = Tools.pagination(page)
             result = (
@@ -105,8 +109,8 @@ class LayerManger:
                         }
                     }
                 )
-                .limit(paging.limit)
-                .skip(paging.skip)
+                    .limit(paging.limit)
+                    .skip(paging.skip)
             )
             resp = []
             for item in result:
