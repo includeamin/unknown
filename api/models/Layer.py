@@ -20,13 +20,19 @@ class DateRange(BaseModel):
         return v
 
 
+class Location(BaseModel):
+    type: str = 'Point'
+    coordinate: List[float]
+
+
 class LayerInformation(BaseModel):
     range: DateRange
+    location: Location
 
 
 class LayerItem(BaseModel):
     information: LayerInformation
-    file_name: str
+    file_name: str = None
 
 
 class Layer(BaseModel):
@@ -55,6 +61,7 @@ class AddLayerModel(BaseModel):
 
 
 class AddNewLayerItem(BaseModel):
+    code: str
     information: LayerInformation
     raw_file_name: str
 
