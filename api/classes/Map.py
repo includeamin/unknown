@@ -16,7 +16,3 @@ class Map:
             ).extract()
             results.append({"layer": layer.name, "result": result})
         return results
-
-    @staticmethod
-    async def valid_layers(base_name: str):
-        pass
