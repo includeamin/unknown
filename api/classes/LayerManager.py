@@ -1,5 +1,4 @@
 from bson import ObjectId
-
 from api.models.Layer import (
     Layer,
     LayerInDB,
