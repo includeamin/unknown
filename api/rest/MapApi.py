@@ -15,9 +15,14 @@ async def map_process(body: WebMapRequestModel):
     return results
 
 
-@user_map_routes.get("/map/available-layers", description='get available layers', status_code=200,
-                     response_model=ValidLayersNearLocation)
+@user_map_routes.get(
+    "/map/available-layers",
+    description="get available layers",
+    status_code=200,
+    response_model=ValidLayersNearLocation,
+)
 async def get_available_layers(longitude: float, latitude: float):
     result = await LayerManger.Shared.find_available_layers_near_coordinate(
-        Coordinate(longitude=longitude, latitude=latitude))
+        Coordinate(longitude=longitude, latitude=latitude)
+    )
     return result

@@ -6,7 +6,7 @@ from api.models.Layer import (
     AddNewLayerItem,
     LayerItem,
     ValidLayers,
-    ValidLayersNearLocation
+    ValidLayersNearLocation,
 )
 from api.db.mongo import layer_collection
 from api.models.GlobalModels import GlobalResult
@@ -36,8 +36,7 @@ class LayerManger:
             item = LayerItem(**data.dict())
             item.file_name = file_name
             result = layer_collection.update_one(
-                {"code": data.code},
-                {"$addToSet": {"layers": item.dict()}},
+                {"code": data.code}, {"$addToSet": {"layers": item.dict()}},
             )
             await Tools.update_result_checker(result)
             return GlobalResult(message="done")
@@ -64,11 +63,29 @@ class LayerManger:
             pass
 
         @staticmethod
-        async def find_available_layers_near_coordinate(coordinate: Coordinate, page: int = 1):
+        async def find_available_layers_near_coordinate(
+            coordinate: Coordinate, page: int = 1
+        ):
             paging = Tools.pagination(page)
-            result = layer_collection.find({"location": {"$near": {
-                "$geometry": {"type": "Point", "coordinates": [coordinate.longitude, coordinate.latitude]}
-            }}}).limit(paging.limit).skip(paging.skip)
+            result = (
+                layer_collection.find(
+                    {
+                        "location": {
+                            "$near": {
+                                "$geometry": {
+                                    "type": "Point",
+                                    "coordinates": [
+                                        coordinate.longitude,
+                                        coordinate.latitude,
+                                    ],
+                                }
+                            }
+                        }
+                    }
+                )
+                .limit(paging.limit)
+                .skip(paging.skip)
+            )
             resp = []
             for item in result:
                 resp.append(ValidLayers(**item))

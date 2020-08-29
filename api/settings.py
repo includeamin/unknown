@@ -9,11 +9,11 @@ class APISettings(BaseSettings):
 
 
 class Storage(BaseSettings):
-    HOST: str = 'localhost:32768'
-    ACCESS_KEY: str = 'minioadmin'
-    SECRET_KEY: str = 'minioadmin'
+    HOST: str = "localhost:32768"
+    ACCESS_KEY: str = "minioadmin"
+    SECRET_KEY: str = "minioadmin"
     SECURE: bool = False
-    RAW_FILES_BUCKET: str = 'raw_files'
+    RAW_FILES_BUCKET: str = "raw_files"
 
 
 api_settings = APISettings()

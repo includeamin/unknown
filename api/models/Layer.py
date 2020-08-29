@@ -21,7 +21,7 @@ class DateRange(BaseModel):
 
 
 class Location(BaseModel):
-    type: str = 'Point'
+    type: str = "Point"
     coordinates: List[float]
 
 
