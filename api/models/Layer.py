@@ -64,7 +64,7 @@ class AddLayerModel(BaseModel):
 
 
 class AddNewLayerItem(BaseModel):
-    code: str
+    layer_id: str
     information: LayerInformation
     raw_file_name: str
 
@@ -94,3 +94,8 @@ class UpdateLayerModel(BaseModel):
     code: str = None
     name: str = None
     description: str = None
+
+
+class GetListOfCodeFileNames(BaseModel):
+    file_name: str
+    code: str

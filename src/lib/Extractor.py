@@ -110,14 +110,25 @@ class S3MultiLayer(ExtractorInterface):
 
     async def extract(self) -> List[SingleValuePixel]:
         results: List[SingleValuePixel] = []
-        layer_list = await self._storage.get_list_of_tiffs(self.base_dir)
-        for layer in layer_list:
-            if layer.__contains__("WSB"):
-                continue
+        if self._storage.forced_path:
             result = await (
-                SingleLayer(self.latitude, self.longitude, layer)
+                SingleLayer(
+                    self.latitude, self.longitude, self._storage.get_storage_path()
+                )
                 .apply_s3(self._storage)
                 .s3_extractor()
             )
             results.append(result)
+        else:
+            layer_list = await self._storage.get_list_of_tiffs(self.base_dir)
+            for layer in layer_list:
+                if layer.__contains__("WSB"):
+                    continue
+                result = await (
+                    SingleLayer(self.latitude, self.longitude, layer)
+                    .apply_s3(self._storage)
+                    .s3_extractor()
+                )
+                results.append(result)
+
         return results

@@ -63,7 +63,7 @@ class StorageManagement(metaclass=Singleton):
 
     def get_storage_path(self, path: Optional[str] = None) -> str:
         if self.forced_path:
-            return f"s3://{self.forced_path}"
+            return os.path.join(f"s3://{self._layerBaseBucket}", self.forced_path)
         if not path:
             raise Exception("path not set")
         return os.path.join(f"s3://{self._layerBaseBucket}", path)

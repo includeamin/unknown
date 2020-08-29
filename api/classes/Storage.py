@@ -31,6 +31,7 @@ class Storage:
     async def move(self):
         if not self.raw or not self._layer_id or not self.new_name:
             raise Exception("parameters not correct")
+
         result = self._minio.copy_object(
             bucket_name=self._layer_bucket,
             object_name=self.layer_file_name(),
