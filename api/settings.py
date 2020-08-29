@@ -13,7 +13,8 @@ class Storage(BaseSettings):
     ACCESS_KEY: str = "minioadmin"
     SECRET_KEY: str = "minioadmin"
     SECURE: bool = False
-    RAW_FILES_BUCKET: str = "raw_files"
+    RAW_FILES_BUCKET: str = "raw-files"
+    LAYER_BUCKET: str = "unknown"
 
 
 api_settings = APISettings()

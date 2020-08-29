@@ -20,6 +20,7 @@ from datetime import timedelta, datetime, date
 from typing import List
 from api.utils.Tools import Tools
 from src.models.Location import Coordinate
+from api.classes.Storage import Storage
 
 
 class LayerManger:
@@ -32,12 +33,17 @@ class LayerManger:
 
         @staticmethod
         async def add_layer_item(data: AddNewLayerItem):
-            await LayerManger.Shared.is_code_exist(code=data.code, should_exist=True)
+            layer_id = await LayerManger.Shared.is_code_exist(
+                code=data.code, should_exist=True
+            )
             file_name = (
                 f"geo-{data.information.range.start.date()}-{data.information.range.end.date()}."
                 f"{data.raw_file_name.split('.')[-1]}"
             )
-            await LayerManger.Shared.move_layer_from_raws(data.raw_file_name, file_name)
+
+            await LayerManger.Shared.move_layer_from_raws(
+                data.raw_file_name, file_name, layer_id=layer_id
+            )
             await LayerManger.Shared.conflict_finder(data.code, data.information)
             item = LayerItem(**data.dict())
             item.file_name = file_name
@@ -109,8 +115,12 @@ class LayerManger:
 
     class Shared:
         @staticmethod
-        async def move_layer_from_raws(raw_file_name: str, new_file_name: str):
-            pass
+        async def move_layer_from_raws(
+            raw_file_name: str, new_file_name: str, layer_id: str
+        ):
+            await Storage(
+                raw_file=raw_file_name, new_name=new_file_name, layer_id=layer_id
+            ).move()
 
         @staticmethod
         async def find_available_layers_near_coordinate(
@@ -152,6 +162,8 @@ class LayerManger:
                 return HTTPException(
                     detail=f"layer with{code} code not exist", status_code=404
                 )
+            if should_exist:
+                return str(result["_id"])
 
         @staticmethod
         async def conflict_finder(code: str, data: LayerInformation):
@@ -170,11 +182,10 @@ class LayerManger:
                 event["start"] = event["start"].date()
                 event["end"] = event["end"].date()
                 overlap = max(
-                    timedelta.min, min(event["end"], end) - max(event["start"], start)
+                    timedelta(days=0),
+                    min(event["end"], end) - max(event["start"], start),
                 )
-                if overlap > timedelta.min:
+                if overlap > timedelta(days=0):
                     overlaps.append(event)
             if overlaps:
-                raise HTTPException(
-                    detail=f"one or more overlap {overlaps}", status_code=400
-                )
+                raise HTTPException(detail=f"{overlaps}", status_code=403)
