@@ -30,6 +30,7 @@ class LayerInformation(BaseModel):
 
 
 class LayerItem(BaseModel):
+    id: str = None
     information: LayerInformation
     file_name: str = None
 

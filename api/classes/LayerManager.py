@@ -16,7 +16,7 @@ from api.db.mongo import layer_collection
 from api.models.GlobalModels import GlobalResult
 from fastapi import HTTPException
 from datetime import timedelta, datetime, date
-from typing import List
+from typing import List, Optional
 from api.utils.Tools import Tools
 from src.models.Location import Coordinate
 from api.classes.Storage import Storage
@@ -35,17 +35,24 @@ class LayerManger:
             layer_id = await LayerManger.Shared.is_code_exist(
                 code=data.code, should_exist=True
             )
-            file_name = (
-                f"geo-{data.information.range.start.date()}-{data.information.range.end.date()}."
-                f"{data.raw_file_name.split('.')[-1]}"
+            item_layer_id = ObjectId()
+            # file_name = (
+            #     f"{str(item_layer_id)}-{data.information.range.start.date()}-{data.information.range.end.date()}."
+            #     f"{data.raw_file_name.split('.')[-1]}"
+            # )
+            file_name = LayerManger.Shared.get_file_name(
+                item_layer_id,
+                data.information.range.start,
+                data.information.range.end,
+                data.raw_file_name,
             )
-
             await LayerManger.Shared.move_layer_from_raws(
                 data.raw_file_name, file_name, layer_id=layer_id
             )
             await LayerManger.Shared.conflict_finder(data.code, data.information)
             item = LayerItem(**data.dict())
             item.file_name = file_name
+            item.id = item_layer_id
             result = layer_collection.update_one(
                 {"code": data.code}, {"$addToSet": {"layers": item.dict()}},
             )
@@ -53,16 +60,34 @@ class LayerManger:
             return GlobalResult(message="done")
 
         @staticmethod
-        async def delete_layer_item(information: LayerInformation, _id: str):
-            result = layer_collection.update_one(
-                {"_id": ObjectId(_id)},
+        async def delete_layer_item(item_id: str, _id: str):
+            pipe_line = [
+                {"$match": {"_id": ObjectId(_id)}},
                 {
-                    "$pull": {
-                        "layers": {"$elemMatch": {"information": information.dict()}}
+                    "$project": {
+                        "layers": {
+                            "$filter": {
+                                "input": "$layers",
+                                "as": "layer",
+                                "cond": {"$eq": ["$$layer.id", ObjectId(item_id)]},
+                            }
+                        }
                     }
                 },
+            ]
+            result: Optional[dict] = None
+            for item in layer_collection.aggregate(pipeline=pipe_line):
+                if item["layers"]:
+                    result = item["layers"][0]
+            if not result:
+                raise HTTPException(detail="item layers not found", status_code=404)
+            file_name = result["file_name"]
+            result = layer_collection.update_one(
+                {"_id": ObjectId(_id)},
+                {"$pull": {"layers": {"id": ObjectId(item_id)}}},
             )
             await Tools.update_result_checker(result)
+            await Storage(layer_id=_id).delete(file_name)
             return GlobalResult(message="done")
 
         @staticmethod
@@ -76,7 +101,7 @@ class LayerManger:
             if body.description:
                 update_value.update({"description": body.description})
             if body.name:
-                update_value.update({"name": body.name})
+                update_value.update({"code": body.name})
             if not update_value:
                 raise HTTPException(detail="nothings for update", status_code=400)
             result = layer_collection.update_one(
@@ -93,6 +118,8 @@ class LayerManger:
         @staticmethod
         async def get(_id):
             result = layer_collection.find_one({"_id": ObjectId(_id)})
+            for item in result["layers"]:
+                item["id"] = str(item["id"])
             return Tools.mongodb_id_converter(result)
 
         @staticmethod
@@ -113,6 +140,15 @@ class LayerManger:
             return GetAllLayers(result=result, page=page)
 
     class Shared:
+        @staticmethod
+        def get_file_name(
+            item_id: ObjectId, start: datetime, end: datetime, raw_file_name: str
+        ):
+            return (
+                f"{str(item_id)}-{start.date()}-{end.date()}."
+                f"{raw_file_name.split('.')[-1]}"
+            )
+
         @staticmethod
         async def move_layer_from_raws(
             raw_file_name: str, new_file_name: str, layer_id: str

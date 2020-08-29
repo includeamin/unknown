@@ -5,6 +5,7 @@ import boto3
 from rasterio.session import AWSSession
 from src.settings.Settings import storage_settings
 from minio import Minio
+from typing import Optional
 import os
 
 
@@ -18,7 +19,7 @@ class Singleton(type):
 
 
 class StorageManagement(metaclass=Singleton):
-    def __init__(self):
+    def __init__(self, layer_bucket: Optional[str] = None):
         self.aws = AWSSession(
             aws_access_key_id=storage_settings.aws_access_key_id,
             aws_secret_access_key=storage_settings.aws_secret_access_key,
@@ -39,13 +40,16 @@ class StorageManagement(metaclass=Singleton):
             + storage_settings.AWS_S3_ENDPOINT,
             use_ssl=storage_settings.IS_SECURE,
         )
-        self._layerBaseBucket = storage_settings.LAYER_BASE_BUCKET
+        self._layerBaseBucket = (
+            storage_settings.LAYER_BASE_BUCKET if not layer_bucket else layer_bucket
+        )
         self._minio = Minio(
             endpoint=storage_settings.AWS_S3_ENDPOINT,
             access_key=storage_settings.aws_access_key_id,
             secret_key=storage_settings.aws_secret_access_key,
             secure=storage_settings.IS_SECURE,
         )
+        self.forced_path: Optional[str] = None
 
     async def get_list_of_tiffs(self, base_path: str) -> List[str]:
         result = self._minio.list_objects(
@@ -53,5 +57,13 @@ class StorageManagement(metaclass=Singleton):
         )
         return [item.object_name for item in result]
 
-    def get_storage_path(self, path) -> str:
+    def apply_forced_path(self, path):
+        self.forced_path = path
+        return self
+
+    def get_storage_path(self, path: Optional[str] = None) -> str:
+        if self.forced_path:
+            return f"s3://{self.forced_path}"
+        if not path:
+            raise Exception("path not set")
         return os.path.join(f"s3://{self._layerBaseBucket}", path)

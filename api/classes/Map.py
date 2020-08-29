@@ -11,8 +11,8 @@ class Map:
             result = await S3MultiLayer(
                 request_model.coordinate.latitude,
                 request_model.coordinate.longitude,
-                layer.name,
+                layer.code,
                 StorageManagement(),
             ).extract()
-            results.append({"layer": layer.name, "result": result})
+            results.append({"layer": layer.code, "result": result})
         return results

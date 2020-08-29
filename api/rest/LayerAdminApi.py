@@ -64,3 +64,16 @@ async def update_layer(_id: str, body: UpdateLayerModel):
 async def get_layer(_id):
     result = await LayerManger.Admin.get(_id)
     return result
+
+
+@admin_layer_routes.delete(
+    "/layer/{layer_id}/item_remove/{item_layer_id}",
+    response_model=GlobalResult,
+    description="delete item layer",
+    status_code=200,
+)
+async def delete_layer_item(layer_id: str, item_layer_id: str):
+    result = await LayerManger.Admin.delete_layer_item(
+        item_id=item_layer_id, _id=layer_id
+    )
+    return result
