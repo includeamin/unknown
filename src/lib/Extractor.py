@@ -44,6 +44,7 @@ class SingleLayer(ExtractorInterface):
 
     def fill_nodata(self):
         self._fill_nodata = True
+        return self
 
     def _process(self, dataset):
         index = dataset.index(self.longitude, self.latitude)
