@@ -23,6 +23,7 @@ class Map:
                         storage.get_storage_path(),
                     )
                     .apply_s3(storage)
+                    .fill_nodata()
                     .s3_extractor()
                 )
                 result.layer = None
@@ -30,8 +31,10 @@ class Map:
             except (ValueError, IndexError) as ex:
                 error = ""
                 if isinstance(ex, IndexError):
+                    print(ex.args)
                     error = "out of range"
                 elif isinstance(ex, ValueError):
+                    print(ex.args)
                     error = "no-data"
                 results.append({"layer": layer.code, "result": error})
 

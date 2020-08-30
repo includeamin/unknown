@@ -9,6 +9,8 @@ from src.lib.StorageManager import StorageManagement
 from src.models.Pixel import SeriesValuePixel, SingleValuePixel
 from src.models.Location import Coordinate
 from src.lib.ReProject import ToEPSG4326, ProjectionTools
+from rasterio.fill import fillnodata
+from rasterio.mask import mask
 
 
 class ExtractorInterface:
@@ -23,6 +25,7 @@ class SingleLayer(ExtractorInterface):
         self.latitude = latitude
         self.longitude = longitude
         self.tif = tif
+        self._fill_nodata: bool = False
 
     def extract(self) -> SeriesValuePixel or SingleValuePixel:
         with rio.open(self.tif, "r") as dataset:
@@ -39,8 +42,8 @@ class SingleLayer(ExtractorInterface):
             with rio.open(self._s3.get_storage_path(self.tif)) as dataset:
                 return self._process(dataset)
 
-    def fill(self):
-        pass
+    def fill_nodata(self):
+        self._fill_nodata = True
 
     def mask(self):
         pass
@@ -52,6 +55,8 @@ class SingleLayer(ExtractorInterface):
         for i in range(1, dataset.count + 1):
             try:
                 image_array = dataset.read(i, window=window)
+                if self._fill_nodata:
+                    fillnodata(image_array, mask=dataset.read_masks(1))
                 pixel_value = image_array[index]
             except IndexError:
                 pixel_value = dataset.read(i)[index]
@@ -69,6 +74,7 @@ class SingleLayer(ExtractorInterface):
                 values=[float(item) for item in pixel_series],
                 layer=self.tif,
             )
+
 
 # class MultiLayer(ExtractorInterface):
 #     def __init__(self, latitude: float, longitude: float, base_dir: str):
