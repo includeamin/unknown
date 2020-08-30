@@ -6,7 +6,7 @@ from src.models.Location import Coordinate
 class LayerOptionModel(BaseModel):
     layer_id: str
     layer_item_id: str
-    code: str
+    # code: str
 
 
 class WebMapRequestModel(BaseModel):

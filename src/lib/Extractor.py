@@ -60,7 +60,7 @@ class SingleLayer(ExtractorInterface):
         else:
             return SeriesValuePixel(
                 coordinate=Coordinate(latitude=self.latitude, longitude=self.longitude),
-                values=pixel_series,
+                values=[float(item) for item in pixel_series],
                 layer=self.tif,
             )
 
