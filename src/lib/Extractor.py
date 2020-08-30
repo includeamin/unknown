@@ -1,16 +1,9 @@
-import glob
-import os
 import rasterio as rio
 from rasterio.windows import Window
-from typing import List, Optional, AsyncIterable
-from logging import info
-
 from src.lib.StorageManager import StorageManagement
 from src.models.Pixel import SeriesValuePixel, SingleValuePixel
 from src.models.Location import Coordinate
-from src.lib.ReProject import ToEPSG4326, ProjectionTools
 from rasterio.fill import fillnodata
-from rasterio.mask import mask
 
 
 class ExtractorInterface:
