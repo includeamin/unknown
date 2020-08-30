@@ -1,5 +1,5 @@
 from api.models.Map import WebMapRequestModel
-from src.lib.Extractor import SingleLayer, S3MultiLayer
+from src.lib.Extractor import SingleLayer
 from src.lib.StorageManager import StorageManagement
 from api.classes.LayerManager import LayerManger
 from api.settings import storage_settings
