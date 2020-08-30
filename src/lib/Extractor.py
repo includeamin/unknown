@@ -45,9 +45,6 @@ class SingleLayer(ExtractorInterface):
     def fill_nodata(self):
         self._fill_nodata = True
 
-    def mask(self):
-        pass
-
     def _process(self, dataset):
         index = dataset.index(self.longitude, self.latitude)
         window = Window(index[1] - 1, index[0] - 1, index[1] + 1, index[0] + 1)
