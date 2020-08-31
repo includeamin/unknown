@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from datetime import datetime, date
+from datetime import datetime
 from typing import List
 from pydantic import validator
 from fastapi import HTTPException

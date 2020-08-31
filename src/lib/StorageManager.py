@@ -1,5 +1,4 @@
-from typing import List, AsyncIterator, AsyncGenerator
-
+from typing import List
 import rasterio
 import boto3
 from rasterio.session import AWSSession

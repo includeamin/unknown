@@ -17,7 +17,7 @@ from api.db.mongo import layer_collection
 from api.models.GlobalModels import GlobalResult
 from fastapi import HTTPException
 from datetime import timedelta, datetime, date
-from typing import List, Optional, Dict
+from typing import List, Optional
 from api.utils.Tools import Tools
 from src.models.Location import Coordinate
 from api.classes.Storage import Storage
