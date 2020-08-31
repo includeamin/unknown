@@ -6,12 +6,7 @@ from src.models.Location import Coordinate
 from rasterio.fill import fillnodata
 
 
-class ExtractorInterface:
-    def extract(self):
-        pass
-
-
-class SingleLayer(ExtractorInterface):
+class SingleLayer:
     _s3: StorageManagement = None
 
     def __init__(self, latitude: float, longitude: float, tif: str):
